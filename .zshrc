@@ -77,7 +77,7 @@ plugins=(
 	python
 	aliases
 	thefuck
-	zsh-you-should-use
+	you-should-use
 	zsh-autosuggestions
 	zsh-syntax-highlighting	 # this must be the last plugin to be enabled
 	history-substring-search  # this must be the only plugin enabled AFTER zsh-syntax-highlighting
