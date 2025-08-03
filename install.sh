@@ -1,5 +1,8 @@
 #!/bin/bash
 # This script installs the dotfiles from a bare git repository
+# install omz
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+# download dotfiles
 function dotfiles {
    /usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@
 }
@@ -13,4 +16,10 @@ if [ $? = 0 ]; then
 fi;
 dotfiles checkout
 dotfiles config status.showUntrackedFiles no
+# isntall fonts
 fc-cache -f
+# install plugins
+dotfiles submodule init
+dotfiles submodule update
+# install thefuck
+pip install https://github.com/nvbn/thefuck/archive/master.zip --user   
