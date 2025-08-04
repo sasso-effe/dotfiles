@@ -76,7 +76,6 @@ plugins=(
 	pip
 	python
 	aliases
-	thefuck
 	you-should-use
 	zsh-autosuggestions
 	zsh-syntax-highlighting	 # this must be the last plugin to be enabled
