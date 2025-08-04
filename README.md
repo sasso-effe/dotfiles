@@ -23,5 +23,5 @@ You can simply run `./install.sh` or do it step by step:
     git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
     git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
     git clone https://github.com/MichaelAquilina/zsh-you-should-use.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/you-should-use
-    pip install https://github.com/nvbn/thefuck/archive/master.zip
+    pip install https://github.com/nvbn/thefuck/archive/master.zip --user
     ```
