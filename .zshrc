@@ -122,8 +122,6 @@ alias cor='conda env remove -n'
 
 alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME"
 
-eval $(thefuck --alias)
-
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
 __conda_setup="$('$HOME/miniforge3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
@@ -143,6 +141,7 @@ if [ -f "$HOME/miniforge3/etc/profile.d/mamba.sh" ]; then
 fi
 # <<< conda initialize <<<
 conda activate
+eval $(thefuck --alias)
 
 export PATH="$HOME/.local/bin:$PATH"
 
