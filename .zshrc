@@ -140,7 +140,6 @@ if [ -f "$HOME/miniforge3/etc/profile.d/mamba.sh" ]; then
 fi
 # <<< conda initialize <<<
 conda activate
-eval $(thefuck --alias)
 
 export PATH="$HOME/.local/bin:$PATH"
 
