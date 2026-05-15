@@ -1,0 +1,10 @@
+.env
+.env.*
+*_history
+*.log
+.ssh/
+.gnupg/
+*token*
+*secret*
+*password*
+*credentials*
