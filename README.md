@@ -2,50 +2,68 @@
 
 ## Set up
 
-You can simply run `./install.sh` or do it step by step:
+### 1. Install zsh
 
- 1. Install **zsh** if not present
- 2. Install **omz** with:
-    ```sh
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-    ```
- 3. Copy the dotfiles to your home directory (`.git` is excluded):
-    ```sh
-    for f in .[^.]*; do [ "$f" != ".git" ] && cp -ir "$f" ..; done
-    ```
- 4. Install fonts with:
-    ```sh
-    fc-cache -f -r
-    ```
- 5. Install theme and plugins:
-    ```sh
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-    git clone https://github.com/MichaelAquilina/zsh-you-should-use.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/you-should-use
-    pip install https://github.com/nvbn/thefuck/archive/master.zip --user
-    ```
+**With admin permissions:**
+```sh
+sudo apt install zsh        # Debian/Ubuntu
+sudo dnf install zsh        # Fedora/RHEL
+```
+
+**Without admin permissions** (via [Miniforge](https://github.com/conda-forge/miniforge)):
+```sh
+conda install -c conda-forge zsh
+```
+
+`.bashrc` will automatically launch the right zsh: it looks for `~/miniforge3/bin/zsh` first, then falls back to whatever is in `$PATH`.
+
+### 2. Run the install script
+
+```sh
+git clone https://github.com/sasso-effe/dotfiles.git ~/dotfiles
+cd ~/dotfiles && ./install.sh
+```
+
+The script will:
+- Install [oh-my-zsh](https://ohmyzsh.sh)
+- Copy the following files to `~/`, overwriting existing ones:
+  - `.zshrc`, `.bashrc`, `.p10k.zsh`
+  - `.config/Code/User/settings.json`
+  - `.local/share/fonts/` (MesloLGS NF)
+- Refresh the font cache
+- Clone the [Powerlevel10k](https://github.com/romkatv/powerlevel10k) theme and plugins: `zsh-syntax-highlighting`, `zsh-autosuggestions`, `you-should-use`
+
+## Features
+
+> This section may not reflect the latest state of `.zshrc`.
+
+**Theme:** [Powerlevel10k](https://github.com/romkatv/powerlevel10k)
+
+**Plugins:** `zsh-syntax-highlighting`, `zsh-autosuggestions`, `you-should-use`, plus several built-in oh-my-zsh plugins (`git`, `extract`, `colored-man-pages`, …)
+
+**Conda/mamba shortcuts:**
+
+| Command | Description |
+|---|---|
+| `coa [env]` | Activate environment |
+| `cod` | Deactivate environment |
+| `coc <env> [python=x.y]` | Create a new environment (default: latest Python) |
+| `coi <pkg>` | Install a package |
+| `cor <env>` | Remove an environment |
 
 ## Keeping config files in sync
 
-The install script **copies** files from this repo into `~/`. The two locations are independent, so you need to manually keep them in sync.
+The install script **copies** files — edits to `~/` are not automatically reflected in the repo.
 
-### After editing files in `~/` directly
-
-Copy the changed files back into the repo, then commit and push:
-
+**Push local changes to the repo:**
 ```sh
 cp ~/.zshrc ~/dotfiles/.zshrc
 cp ~/.p10k.zsh ~/dotfiles/.p10k.zsh
 cp ~/.bashrc ~/dotfiles/.bashrc
-# repeat for any other changed file
-cd ~/dotfiles && git add . && git commit -m "update configs" && git push
+cd ~/dotfiles && git add . && git commit -m "chore: update configs" && git push
 ```
 
-### After pulling updates from the repo
-
-Re-run the copy step to apply them to `~/`:
-
+**Apply repo updates to `~/`:**
 ```sh
 cd ~/dotfiles && git pull
 for f in .[^.]*; do [ "$f" != ".git" ] && cp -ir "$f" ..; done
