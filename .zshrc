@@ -55,26 +55,14 @@ function coc() {
 alias coi='mamba install'
 alias cor='mamba env remove -n'
 
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('$HOME/miniforge3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "$HOME/miniforge3/etc/profile.d/conda.sh" ]; then
-        . "$HOME/miniforge3/etc/profile.d/conda.sh"
-    else
-        export PATH="$HOME/miniforge3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-
-if [ -f "$HOME/miniforge3/etc/profile.d/mamba.sh" ]; then
+# conda/mamba: pure-shell setup, no Python or mamba binary spawned at startup
+if [ -f "$HOME/miniforge3/etc/profile.d/conda.sh" ]; then
+    . "$HOME/miniforge3/etc/profile.d/conda.sh"
     export MAMBA_EXE="$HOME/miniforge3/bin/mamba"
-    . "$HOME/miniforge3/etc/profile.d/mamba.sh"
+    [ -f "$HOME/miniforge3/etc/profile.d/mamba.sh" ] && . "$HOME/miniforge3/etc/profile.d/mamba.sh"
+    # Equivalent of `conda activate` (base) without running conda
+    export PATH="$HOME/miniforge3/bin:$PATH" CONDA_PREFIX="$HOME/miniforge3" CONDA_DEFAULT_ENV=base CONDA_SHLVL=1
 fi
-# <<< conda initialize <<<
-conda activate
 
 export PATH="$HOME/.local/bin:$PATH"
 
