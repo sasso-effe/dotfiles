@@ -14,6 +14,20 @@ fi
 # dotfiles
 for f in .[^.]*; do [ "$f" != ".git" ] && cp -ir "$f" ..; done
 
+# pixi (replaces conda/mamba)
+if [ -x "$HOME/.pixi/bin/pixi" ]; then
+  skip "pixi"
+else
+  # .zshrc already puts ~/.pixi/bin on PATH, so don't let the installer edit shell rc files
+  curl -fsSL https://pixi.sh/install.sh | PIXI_NO_PATH_UPDATE=1 bash
+fi
+
+# global tools (re-running is safe: already-installed environments are kept)
+PIXI="$HOME/.pixi/bin/pixi"
+"$PIXI" global install "python=3.12"
+"$PIXI" global install -e build-tools gcc gxx binutils make cmake
+"$PIXI" global install speedtest-cli
+
 # font cache
 fc-cache -f -r
 

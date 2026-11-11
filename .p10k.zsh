@@ -48,6 +48,7 @@
     asdf                    # asdf version manager (https://github.com/asdf-vm/asdf)
     virtualenv              # python virtual environment (https://docs.python.org/3/library/venv.html)
     anaconda                # conda environment (https://conda.io/)
+    pixi                    # pixi environment (https://pixi.sh/), user-defined below
     pyenv                   # python environment (https://github.com/pyenv/pyenv)
     goenv                   # go environment (https://github.com/syndbg/goenv)
     nodenv                  # node.js version from nodenv (https://github.com/nodenv/nodenv)
@@ -960,10 +961,51 @@
   # The default value of POWERLEVEL9K_ANACONDA_CONTENT_EXPANSION expands to $CONDA_PROMPT_MODIFIER
   # without the surrounding parentheses, or to the last path component of CONDA_PREFIX if the former
   # is empty.
-  typeset -g POWERLEVEL9K_ANACONDA_CONTENT_EXPANSION='${${${${CONDA_PROMPT_MODIFIER#\(}% }%\)}:-${CONDA_PREFIX:t}}'
+  #
+  # `pixi shell` also sets CONDA_PREFIX, which would show this segment for pixi envs too. The pixi
+  # segment (below) covers those, so while PIXI_PROJECT_NAME is set both expansions come out empty
+  # (`${x:#$PIXI_PROJECT_NAME}` drops x when it equals the project name), and p10k hides segments
+  # with no icon and no content.
+  typeset -g POWERLEVEL9K_ANACONDA_CONTENT_EXPANSION='${${PIXI_PROJECT_NAME:-${${${${CONDA_PROMPT_MODIFIER#\(}% }%\)}:-${CONDA_PREFIX:t}}}:#$PIXI_PROJECT_NAME}'
+  typeset -g POWERLEVEL9K_ANACONDA_VISUAL_IDENTIFIER_EXPANSION='${${PIXI_PROJECT_NAME:-$P9K_VISUAL_IDENTIFIER}:#$PIXI_PROJECT_NAME}'
 
-  # Custom icon.
-  # typeset -g POWERLEVEL9K_ANACONDA_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  ##########################[ pixi: pixi environment (https://pixi.sh) ]##########################
+  # User-defined segment; p10k has no built-in one. Two states:
+  #   ACTIVE    in `pixi shell` (or after `eval "$(pixi shell-hook)"`): icon and project name, plus
+  #             ":<env>" for a non-default environment, e.g. `pyslam` or `pyslam:lint`.
+  #   INACTIVE  the current directory is inside a pixi project that isn't activated: a dim icon only
+  #             (the dir segment already shows where you are).
+  # To hide a state, empty both its expansions, e.g. for INACTIVE:
+  #   typeset -g POWERLEVEL9K_PIXI_INACTIVE_VISUAL_IDENTIFIER_EXPANSION=
+  #   typeset -g POWERLEVEL9K_PIXI_INACTIVE_CONTENT_EXPANSION=
+  # There is no instant_prompt_pixi: its output depends on the directory and environment, so the
+  # segment appears a moment after instant prompt instead.
+  typeset -g POWERLEVEL9K_PIXI_ACTIVE_FOREGROUND=178
+  typeset -g POWERLEVEL9K_PIXI_INACTIVE_FOREGROUND=244
+
+  zmodload zsh/mapfile 2>/dev/null  # read files without spawning a process (used below)
+
+  function prompt_pixi() {
+    local icon=$''  # nf-oct-package
+    if [[ -n $PIXI_PROJECT_NAME ]]; then
+      local env=${PIXI_ENVIRONMENT_NAME:#default}
+      p10k segment -s ACTIVE -i $icon -t "${PIXI_PROJECT_NAME//\%/%%}${env:+:${env//\%/%%}}"
+      return
+    fi
+    # Look for a workspace manifest here or in a parent directory, the same way pixi does:
+    # pixi.toml, or pyproject.toml with a [tool.pixi.workspace] (legacy: [tool.pixi.project]) table.
+    # Only zsh builtins: about 0.1 ms per prompt.
+    local dir=$PWD
+    while true; do
+      if [[ -f $dir/pixi.toml ||
+            ${mapfile[$dir/pyproject.toml]} == (|*$'\n')"[tool.pixi."(workspace|project)"]"* ]]; then
+        p10k segment -s INACTIVE -i $icon
+        return
+      fi
+      [[ $dir == / ]] && return
+      dir=${dir:h}
+    done
+  }
 
   ################[ pyenv: python environment (https://github.com/pyenv/pyenv) ]################
   # Pyenv color.

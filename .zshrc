@@ -25,6 +25,19 @@ plugins=(
 
 zstyle ':omz:plugins:alias-finder' autoload yes
 
+# pixi: global tools on PATH, plus completions. This has to come before oh-my-zsh,
+# which runs compinit. pixi's own completion is cached into oh-my-zsh's completion
+# dir and only regenerated when the pixi binary changes, so normally no process starts.
+export PATH="$HOME/.pixi/bin:$PATH"
+fpath+=("$HOME/.pixi/completions/zsh")
+if [[ -x "$HOME/.pixi/bin/pixi" ]]; then
+    _pixi_comp="${ZSH_CACHE_DIR:-$ZSH/cache}/completions/_pixi"
+    if [[ ! -s "$_pixi_comp" || "$HOME/.pixi/bin/pixi" -nt "$_pixi_comp" ]]; then
+        mkdir -p "${_pixi_comp:h}" && "$HOME/.pixi/bin/pixi" completion --shell zsh >| "$_pixi_comp"
+    fi
+    unset _pixi_comp
+fi
+
 source $ZSH/oh-my-zsh.sh
 
 # env variables
@@ -36,33 +49,9 @@ alias src="source ~/.zshrc"
 
 alias ls='ls --color=auto'
 alias grep='grep --color=auto'
-alias coa='conda activate'
-alias cod='conda deactivate'
-function coc() {
-    if [[ -z "$1" ]]; then
-        echo "Usage: coc [env_name] [python=version]"
-        return 1
-    fi
-
-    local env_name="$1"
-    local python_spec="python"
-    if [[ "$2" == python=* ]]; then
-        python_spec="python=${2#python=}"
-    fi
-
-    mamba create -y -n "$env_name" "$python_spec"
-}
-alias coi='mamba install'
-alias cor='mamba env remove -n'
-
-# conda/mamba: pure-shell setup, no Python or mamba binary spawned at startup
-if [ -f "$HOME/miniforge3/etc/profile.d/conda.sh" ]; then
-    . "$HOME/miniforge3/etc/profile.d/conda.sh"
-    export MAMBA_EXE="$HOME/miniforge3/bin/mamba"
-    [ -f "$HOME/miniforge3/etc/profile.d/mamba.sh" ] && . "$HOME/miniforge3/etc/profile.d/mamba.sh"
-    # Equivalent of `conda activate` (base) without running conda
-    export PATH="$HOME/miniforge3/bin:$PATH" CONDA_PREFIX="$HOME/miniforge3" CONDA_DEFAULT_ENV=base CONDA_SHLVL=1
-fi
+alias pxs='pixi shell'
+alias pxr='pixi run'
+alias pxa='pixi add'
 
 export PATH="$HOME/.local/bin:$PATH"
 
